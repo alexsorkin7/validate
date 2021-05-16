@@ -1,0 +1,22 @@
+{
+    "name": "also/validate",
+    "description": "The class validate if data inside array match the requirements.",
+    "type": "library",
+    "require": {
+        "also/model": "0.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Sorkin",
+            "email": "Alesorkin1980@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload":{
+        "psr-4": {
+            "Also\\":""
+        }
+    }
+
+}
