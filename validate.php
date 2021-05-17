@@ -8,6 +8,7 @@ class Validate {
         $this->obj = $obj;
         $this->data = $data;
         $this->model = $model;
+        return $this;
     }
 
     public function run() {
@@ -71,6 +72,7 @@ class Validate {
         'exists' => 'The ~0~ allready exists',
         'notExists' => 'The ~0~ not exists',
         'password' => 'The ~0~ is not match',
+        'db' => 'db error'
     ];
 
     private function confirm($field,$value,$field2) {
@@ -144,23 +146,19 @@ class Validate {
 
     private function exists($field,$value,$tableName) {
         if($this->model !== '') {
-            $this->model->
+            $result = $this->model->
             $model($tableName)->
-            where(["$field = $value"]);
-            if(count($result['result']) > 0) {
-                return $this->buildError('exists',compact('field','value'));
-            } else return true;
+            where(["$field = '$value'"]);
+            return $this->modelError($result,$field);
         } else return null;
     }
 
     private function notExists($field,$value,$tableName) {
         if($this->model !== '') {
-            $this->model->
-            $model($tableName)->
-            where(["$field = $value"]);
-            if(count($result['result']) == 0) {
-                return $this->buildError('notExists',compact('field','value'));
-            } else return true;
+            $result = $this->model->
+            model($tableName)->
+            where(["$field = '$value'"]);
+            return $this->modelError($result,$field);
         } else return null;
     }
 
@@ -174,15 +172,21 @@ class Validate {
                 $where[] = "email=".$this->data['email'];
             }
 
-            $this->model->
-            $model($tableName)->
-            where(["$field = $value"]);
-            if(count($result['result']) == 0) {
-                return $this->buildError('password',compact('field'));
-            } else return true;
-
+            $result = $this->model->
+            model($tableName)->
+            where(["$field = '$value'"]);
+            return $this->modelError($result,$field);
         } else return null;
      }
+
+    private function modelError($result,$field) {
+        if(!isset($result['result'])) {
+            return $this->buildError('db',[]);
+        } else if(count($result['result']) == 0) {
+            return $this->buildError('password',compact('field'));
+        } else return true;
+
+    }
 
     // private function name() {
     //     $name = test_input($_POST["name"]);
