@@ -8,7 +8,6 @@ class Validate {
         $this->obj = $obj;
         $this->data = $data;
         $this->model = $model;
-        return $this;
     }
 
     public function run() {
@@ -166,16 +165,23 @@ class Validate {
         if($this->model !== '') {
             $where = [];
             if(isset($this->data['id'])) {
-                $where[] = "id=".$this->data['id'];
+                $where[] = "id='".$this->data['id']."'";
             }
             if(isset($this->data['email'])) {
-                $where[] = "email=".$this->data['email'];
+                $where[] = "email='".$this->data['email']."'";
             }
-
+            // if(isset($this->hash)) $value = password_hash($value, $this->hash); 
             $result = $this->model->
             model($tableName)->
-            where(["$field = '$value'"]);
-            return $this->modelError($result,$field);
+            // where(["$field = '$value'"]);
+            where($where);
+            if(isset($result['result'])) {
+                if(count($result['result']) >0) {
+                    $password = $result['result'][0][$field];
+                    if(password_verify($value,$password)) return true;
+                    else return $this->buildError('password',compact('field'));
+                }
+            } else return $this->buildError('db',[]);
         } else return null;
      }
 
