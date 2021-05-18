@@ -87,13 +87,6 @@ The example above checking password field ``"aaa333$F"`` for:
 5. required - the field is not empty
 
 
-## Customize errors
-All errors placed as functions inside Validator.$errors. 
-There are two ways to customize errors:
-1. Go to node_modules\validate.js and change the error content to what ever you want
-2. Create new Validator object and then change the errors content on new object.$errors
-
-
 ## Model and async method
 
 To use model, you need to install ``also\model`` and create new model object with sqlite or mysql data base. 

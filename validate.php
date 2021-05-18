@@ -102,13 +102,13 @@ class Validate {
     }
 
     private function lowers($field,$value,$times=1) {
-        preg_match('(?=.*[a-z])',$value,$matches);
+        preg_match('/([a-z])*/',$value,$matches);
         if(count($matches) >= $times) return true;
         else return $this->buildError('lowers',compact('field','times'));
     }
 
     private function uppers($field,$value,$times=1) {
-        preg_match('(?=.*[A-Z])',$value,$matches);
+        preg_match('/([A-Z])*/',$value,$matches);
         if(count($matches) >= $times) return true;
         else return $this->buildError('uppers',compact('field','times'));
     }
@@ -120,7 +120,7 @@ class Validate {
     }
 
     private function symbols($field,$value,$times=1) {
-        preg_match('[-+_!@#$%^&*.,?]',$value,$matches);
+        preg_match('/([-+_!@#$%^&*.,?])*/',$value,$matches);
         if(count($matches) >= $times) return true;
         else return $this->buildError('symbols',compact('field','times'));
     }
@@ -145,10 +145,8 @@ class Validate {
 
     private function exists($field,$value,$tableName) {
         if($this->model !== '') {
-            $result = $this->model->
-            $model($tableName)->
-            where(["$field = '$value'"]);
-            return $this->modelError($result,$field);
+            $result = $this->model->model($tableName)->where(["$field = '$value'"]);
+            return $this->modelError($result,$field,true);
         } else return null;
     }
 
@@ -157,7 +155,7 @@ class Validate {
             $result = $this->model->
             model($tableName)->
             where(["$field = '$value'"]);
-            return $this->modelError($result,$field);
+            return $this->modelError($result,$field,false);
         } else return null;
     }
 
@@ -185,13 +183,12 @@ class Validate {
         } else return null;
      }
 
-    private function modelError($result,$field) {
+    private function modelError($result,$field,$condition) {
         if(!isset($result['result'])) {
             return $this->buildError('db',[]);
-        } else if(count($result['result']) == 0) {
+        } else if(count($result['result']) == $condition) {
             return $this->buildError('password',compact('field'));
         } else return true;
-
     }
 
     // private function name() {
