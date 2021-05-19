@@ -145,51 +145,47 @@ class Validate {
 
     private function exists($field,$value,$tableName) {
         if($this->model !== '') {
-            $result = $this->model->model($tableName)->where(["$field = '$value'"]);
-            return $this->modelError($result,$field,true);
+            $result = $this->model
+            ->table($tableName)
+            ->where($field,$value)->get();
+            if(isset($result['error'])) return $this->buildError('db',[]);
+            else if(count($result) > 0) return true;
+            else return $this->buildError('exists',compact('field'));
         } else return null;
     }
 
     private function notExists($field,$value,$tableName) {
         if($this->model !== '') {
-            $result = $this->model->
-            model($tableName)->
-            where(["$field = '$value'"]);
-            return $this->modelError($result,$field,false);
+            $result = $this->model
+            ->table($tableName)
+            ->where($field,$value)->get();
+            if(isset($result['error'])) return $this->buildError('db',[]);
+            else if(count($result) == 0) return true;
+            else return $this->buildError('notExists',compact('field'));
         } else return null;
     }
 
+
     private function password($field,$value,$tableName) {
         if($this->model !== '') {
-            $where = [];
             if(isset($this->data['id'])) {
-                $where[] = "id='".$this->data['id']."'";
+                $result = $this->model
+                ->table($tableName)->id($data['id'])->get();
             }
             if(isset($this->data['email'])) {
-                $where[] = "email='".$this->data['email']."'";
+                $result = $this->model
+                ->table($tableName)->
+                where('email',$this->data['email'])->get();
             }
-            // if(isset($this->hash)) $value = password_hash($value, $this->hash); 
-            $result = $this->model->
-            model($tableName)->
-            // where(["$field = '$value'"]);
-            where($where);
-            if(isset($result['result'])) {
-                if(count($result['result']) >0) {
-                    $password = $result['result'][0][$field];
+            if(!isset($result['error'])) {
+                if(count($result) >0) {
+                    $password = $result[$field];
                     if(password_verify($value,$password)) return true;
                     else return $this->buildError('password',compact('field'));
                 }
             } else return $this->buildError('db',[]);
         } else return null;
      }
-
-    private function modelError($result,$field,$condition) {
-        if(!isset($result['result'])) {
-            return $this->buildError('db',[]);
-        } else if(count($result['result']) == $condition) {
-            return $this->buildError('password',compact('field'));
-        } else return true;
-    }
 
     // private function name() {
     //     $name = test_input($_POST["name"]);
