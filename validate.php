@@ -92,12 +92,12 @@ class Validate {
     }
 
     private function min($field,$value,$length=3) {
-        if(!strlen($value) <= $length) return true;
+        if(strlen($value) >= $length) return true;
         else return $this->buildError('min',compact('field','length'));
     }
 
     private function max($field,$value,$length=10) {
-        if(!strlen($value) > $length) return true;
+        if(strlen($value) < $length) return true;
         else return $this->buildError('max',compact('field','length'));
     }
 
@@ -149,8 +149,8 @@ class Validate {
             ->table($tableName)
             ->where($field,$value)->get();
             if(isset($result['error'])) return $this->buildError('db',[]);
-            else if(count($result) > 0) return true;
-            else return $this->buildError('exists',compact('field'));
+            else if(count($result) > 0) return $this->buildError('exists',compact('field'));
+            else return true;
         } else return null;
     }
 
@@ -170,7 +170,7 @@ class Validate {
         if($this->model !== '') {
             if(isset($this->data['id'])) {
                 $result = $this->model
-                ->table($tableName)->id($data['id'])->get();
+                ->table($tableName)->id($this->data['id'])->get();
             }
             if(isset($this->data['email'])) {
                 $result = $this->model
@@ -186,14 +186,6 @@ class Validate {
             } else return $this->buildError('db',[]);
         } else return null;
      }
-
-    // private function name() {
-    //     $name = test_input($_POST["name"]);
-    //     if (!preg_match("/^[a-zA-Z-' ]*$/",$name)) {
-    //         $nameErr = "Only letters and white space allowed";
-    //     }
-    // }
-
 
 }
 
